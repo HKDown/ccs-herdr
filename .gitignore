@@ -1,3 +1,8 @@
 target/
 **/*.rs.bk
 *.pdb
+
+*.log
+build_*.py
+dist/
+

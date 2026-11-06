@@ -76,6 +76,13 @@ ccs 自己的状态仍在 ccs 的 CCS_HOME（默认 ~/.ccs），本工具只读�
 - 面板使用行式交互（不需要 Unix termios / Windows 控制台 API）；
 - CI（.github/workflows/ci.yml）在 ubuntu/windows/macos 上 cargo test + build。
 
+## 验证
+
+- `cargo check --all-targets`、`cargo fmt --check`、`cargo clippy --all-targets -- -D warnings` 通过；
+- `cargo build --release` 在本机产出 Windows 二进制（约 480 KB），已实测 `version` / `doctor` / `list` / `restore`
+  与 ccs 守护进程（TCP JSON-RPC）正常通信；
+- `cargo test` 由 CI 在 ubuntu / windows / macos 三个平台运行（见 .github/workflows/ci.yml）。
+
 ## License
 
 MIT

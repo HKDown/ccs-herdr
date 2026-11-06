@@ -76,10 +76,10 @@ namespace ccsHerdrSetup
     static class AppInfo
     {
         public const string Name = "ccs-herdr";
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
         public const string Publisher = "ccs-herdr";
         public const string UninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\ccs-herdr";
-        public const string HerdrVersion = "ccs 0.3.1 + ccs-herdr 0.1.0";
+        public const string HerdrVersion = "ccs 0.3.1 + ccs-herdr 0.1.0 + herdr 0.9.5";
 
         public static string DefaultDir
         {
@@ -93,6 +93,8 @@ namespace ccsHerdrSetup
         public static string EngineExe(string dir) { return Path.Combine(EngineDir(dir), "ccs.exe"); }
         public static string BridgeExe(string dir) { return Path.Combine(dir, "ccs-herdr.exe"); }
         public static string PluginDir(string dir) { return Path.Combine(dir, "plugin"); }
+        public static string HerdrDir(string dir) { return Path.Combine(dir, "herdr"); }
+        public static string HerdrExe(string dir) { return Path.Combine(HerdrDir(dir), "herdr.exe"); }
 
         public static string StartMenuDir
         {
@@ -113,6 +115,28 @@ namespace ccsHerdrSetup
                 psi.CreateNoWindow = true;
                 psi.RedirectStandardOutput = true;
                 psi.RedirectStandardError = true;
+                using (Process p = Process.Start(psi))
+                {
+                    string so = p.StandardOutput.ReadToEnd();
+                    string se = p.StandardError.ReadToEnd();
+                    if (!p.WaitForExit(timeoutMs)) { try { p.Kill(); } catch { } return so + se; }
+                    return so + se;
+                }
+            }
+            catch (Exception ex) { return ex.Message; }
+        }
+
+        public static string RunEnv(string exe, string args, int timeoutMs, string envName, string envValue)
+        {
+            Log.W("run(env " + envName + "=" + envValue + "): " + exe + " " + args);
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo(exe, args);
+                psi.UseShellExecute = false;
+                psi.CreateNoWindow = true;
+                psi.RedirectStandardOutput = true;
+                psi.RedirectStandardError = true;
+                psi.EnvironmentVariables[envName] = envValue;
                 using (Process p = Process.Start(psi))
                 {
                     string so = p.StandardOutput.ReadToEnd();
@@ -233,6 +257,7 @@ namespace ccsHerdrSetup
             {
                 Sys.AddToUserPath(dir);
                 Sys.AddToUserPath(AppInfo.EngineDir(dir));
+                if (installHerdr) Sys.AddToUserPath(AppInfo.HerdrDir(dir));
             }
             catch (Exception ex) { Warnings.Add("写入用户 PATH 失败（可手动添加）: " + ex.Message); }
 
@@ -243,6 +268,8 @@ namespace ccsHerdrSetup
                     AppInfo.EngineExe(dir), dir, "ccs 可视化控制台（浏览器）", AppInfo.EngineExe(dir), "web --open");
                 Sys.CreateShortcut(Path.Combine(AppInfo.StartMenuDir, "ccs-herdr 面板.lnk"),
                     AppInfo.BridgeExe(dir), dir, "ccs 会话面板", AppInfo.BridgeExe(dir), "pane");
+                Sys.CreateShortcut(Path.Combine(AppInfo.StartMenuDir, "Herdr TUI.lnk"),
+                    AppInfo.HerdrExe(dir), AppInfo.HerdrDir(dir), "Herdr TUI（已内置）", AppInfo.HerdrExe(dir), "");
                 if (desktop)
                 {
                     Sys.CreateShortcut(Path.Combine(AppInfo.DesktopDir, "ccs-herdr 面板.lnk"),
@@ -254,29 +281,26 @@ namespace ccsHerdrSetup
             Report(progress, "注册卸载信息…", 72);
             WriteUninstallEntry();
 
-            Report(progress, "检查 Herdr…", 80);
-            string herdrExe = Sys.FindOnPath("herdr.exe");
-            if (herdrExe == null)
+            Report(progress, "检查内置 Herdr TUI…", 80);
+            string herdrExe = AppInfo.HerdrExe(dir);
+            if (!File.Exists(herdrExe))
             {
-                if (installHerdr)
-                {
-                    Report(progress, "安装 Herdr（需要网络）…", 84);
-                    string output = Sys.Run("powershell.exe",
-                        "-NoProfile -ExecutionPolicy Bypass -Command \"irm https://herdr.dev/install.ps1 | iex\"", 300000);
-                    herdrExe = Sys.FindOnPath("herdr.exe");
-                    if (herdrExe == null) Warnings.Add("Herdr 自动安装未成功，请手动安装后运行 ccs-herdr install-plugin");
-                    else Warnings.Add("已安装 Herdr: " + output.Trim());
-                }
-                else
-                {
-                    Warnings.Add("未检测到 Herdr：装好 Herdr 后运行 ccs-herdr install-plugin");
-                }
+                Warnings.Add("安装包缺少内置 Herdr（herdr/herdr.exe），请重新下载完整安装包");
+            }
+            else if (installHerdr)
+            {
+                string herdrVer = Sys.Run(herdrExe, "--version", 20000).Trim();
+                Warnings.Add("已内置 Herdr TUI: " + (string.IsNullOrEmpty(herdrVer) ? herdrExe : herdrVer));
             }
 
             Report(progress, "链接 Herdr 插件…", 90);
-            if (herdrExe != null)
+            if (!File.Exists(herdrExe))
             {
-                string linkOut = Sys.Run(AppInfo.BridgeExe(dir), "install-plugin", 60000);
+                Warnings.Add("跳过插件链接：内置 Herdr 不存在");
+            }
+            else
+            {
+                string linkOut = Sys.RunEnv(AppInfo.BridgeExe(dir), "install-plugin", 60000, "HERDR_BIN_PATH", herdrExe);
                 Warnings.Add("Herdr 插件链接结果: " + linkOut.Trim());
             }
 
@@ -351,12 +375,15 @@ namespace ccsHerdrSetup
             }
             try { Sys.RemoveFromUserPath(dir); } catch { }
             try { Sys.RemoveFromUserPath(AppInfo.EngineDir(dir)); } catch { }
+            try { Sys.RemoveFromUserPath(AppInfo.HerdrDir(dir)); } catch { }
             Sys.DeleteFileSafe(Path.Combine(AppInfo.StartMenuDir, "ccs 控制台.lnk"));
             Sys.DeleteFileSafe(Path.Combine(AppInfo.StartMenuDir, "ccs-herdr 面板.lnk"));
+            Sys.DeleteFileSafe(Path.Combine(AppInfo.StartMenuDir, "Herdr TUI.lnk"));
             Sys.DeleteFileSafe(Path.Combine(AppInfo.DesktopDir, "ccs-herdr 面板.lnk"));
             try { Registry.CurrentUser.DeleteSubKeyTree(AppInfo.UninstallKey, false); } catch { }
-            // 尽量移除 Herdr 插件链接（有 herdr 时可手动再执行 herdr plugin uninstall）
-            string herdr = Sys.FindOnPath("herdr.exe");
+            // 用内置 herdr 移除插件链接；找不到再退回 PATH 上的 herdr
+            string herdr = AppInfo.HerdrExe(dir);
+            if (!File.Exists(herdr)) herdr = Sys.FindOnPath("herdr.exe");
             if (herdr != null)
             {
                 Sys.Run(herdr, "plugin uninstall ccs.sessions", 30000);
@@ -406,7 +433,7 @@ namespace ccsHerdrSetup
             title.Size = new Size(560, 32);
 
             Label subtitle = new Label();
-            subtitle.Text = "一次安装全部：ccs 引擎（会话/恢复/总线）+ ccs-herdr（Herdr 桥接与插件）。";
+            subtitle.Text = "一次安装全部（离线可用）：ccs 引擎 + ccs-herdr 桥接 + Herdr TUI + 插件。";
             subtitle.Location = new Point(22, 52);
             subtitle.Size = new Size(560, 40);
 
@@ -430,10 +457,10 @@ namespace ccsHerdrSetup
                 if (dialog.ShowDialog(this) == DialogResult.OK) pathBox.Text = dialog.SelectedPath;
             };
 
-            herdrBox.Text = "同时安装 Herdr（需要网络；已安装则自动跳过）";
+            herdrBox.Text = "安装内置 Herdr TUI（离线可用，推荐）";
             herdrBox.Location = new Point(22, 160);
             herdrBox.Size = new Size(540, 24);
-            herdrBox.Checked = Sys.FindOnPath("herdr.exe") == null;
+            herdrBox.Checked = true;
 
             deskBox.Text = "创建桌面快捷方式";
             deskBox.Location = new Point(22, 186);
@@ -522,7 +549,8 @@ namespace ccsHerdrSetup
             bar.Value = 100;
             status.Text = "安装完成。";
             string message = "ccs-herdr 已安装到:\n" + installer.TargetDir +
-                "\n\n请重新打开一个终端（让 PATH 生效），然后运行:\n  ccs-herdr doctor\n  ccs-herdr open";
+                "\n\n请重新打开一个终端（让 PATH 生效），然后运行:\n  ccs-herdr doctor\n  ccs-herdr open" +
+                "\n\nHerdr TUI 也已安装（开始菜单「Herdr TUI」），无需联网。";
             if (installer.Warnings.Count > 0)
             {
                 message += "\n\n提示:";

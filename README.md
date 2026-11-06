@@ -35,14 +35,14 @@
 
 ## 一键安装（推荐）
 
-下载 `ccs-herdr-setup-0.2.0.exe` 双击安装即可，**不需要另外安装 ccs**：
+下载 `ccs-herdr-setup-0.3.0.exe` 双击安装即可，**不需要另外安装 ccs，也不需要联网**：
 
-- 安装包内置 ccs 引擎（ccs 0.3.1，含 Python 运行时）、ccs-herdr 桥接、Herdr 插件；
-- 装到 `%LOCALAPPDATA%\Programs\ccs-herdr`，自动加 PATH、创建「ccs 控制台」和「ccs-herdr 面板」快捷方式；
-- 检测到 Herdr TUI 时自动 `herdr plugin link`；没装 Herdr 可在安装界面勾选自动安装（走官方 `https://herdr.dev/install.ps1`，即 TUI 安装器，需要网络）；
-- 卸载：设置 → 应用 → ccs-herdr，或安装目录下 `ccs-herdr-uninstall.exe`。
+- 安装包**离线内置全部组件**：ccs 引擎（ccs 0.3.1，含 Python 运行时）、ccs-herdr 桥接、**Herdr TUI 0.9.5**（`herdr.exe` + ConPTY 运行时）、Herdr 插件；
+- 装到 `%LOCALAPPDATA%\Programs\ccs-herdr`，自动加 PATH（安装目录 / engine / herdr），创建「ccs 控制台」「ccs-herdr 面板」「Herdr TUI」快捷方式；
+- 安装时自动用内置 Herdr 执行 `herdr plugin link`，装完即可用；
+- 卸载：设置 → 应用 → ccs-herdr，或安装目录下 `ccs-herdr-uninstall.exe`（同时移除插件链接与 PATH）。
 
-静默安装：`ccs-herdr-setup-0.2.0.exe /S /DIR="D:\Tools\ccs-herdr" /herdr`
+静默安装：`ccs-herdr-setup-0.3.0.exe /S /DIR="D:\Tools\ccs-herdr"`（无网络请求）
 
 ## 构建
 

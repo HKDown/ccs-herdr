@@ -56,6 +56,17 @@ pub fn ccs_bin() -> Option<PathBuf> {
             }
         }
     }
+    // 安装包内置的 ccs 引擎：<ccs-herdr.exe 目录>/engine/ccs.exe
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            for rel in ["engine/ccs.exe", "engine/ccs", "ccs.exe"] {
+                let candidate = dir.join(rel);
+                if candidate.is_file() {
+                    return Some(candidate);
+                }
+            }
+        }
+    }
     paths::which("ccs")
 }
 

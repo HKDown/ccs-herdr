@@ -14,6 +14,17 @@ pub fn herdr_bin() -> Option<PathBuf> {
             }
         }
     }
+    // 安装包内置的 Herdr：与 ccs-herdr.exe 同级目录下的 herdr/herdr.exe
+    if let Ok(exe) = std::env::current_exe() {
+        if let Some(dir) = exe.parent() {
+            for rel in ["herdr/herdr.exe", "herdr/herdr", "herdr.exe"] {
+                let candidate = dir.join(rel);
+                if candidate.is_file() {
+                    return Some(candidate);
+                }
+            }
+        }
+    }
     paths::which("herdr")
 }
 

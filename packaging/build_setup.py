@@ -16,10 +16,12 @@ import sys
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 ENGINE = os.environ.get("CCS_ENGINE_DIR") or os.path.join(ROOT, "..", "ccs-tool", "build", "dist", "ccs")
 BRIDGE = os.path.join(ROOT, "target", "release", "ccs-herdr.exe")
 PLUGIN = os.path.join(ROOT, "plugin")
+# 内置 Herdr TUI（Windows 官方发布包解压目录：herdr.exe + conpty/ + THIRD-PARTY-NOTICES/）
+HERDR_TUI = os.environ.get("HERDR_TUI_DIR") or os.path.join(ROOT, "..", "herdr-src", "herdr-tui-bin")
 ICON = os.path.join(ROOT, "assets", "icon.ico")
 CSC = r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 
@@ -40,6 +42,8 @@ def main():
         sys.exit("找不到 %s，先 cargo build --release" % BRIDGE)
     if not os.path.isfile(ICON):
         sys.exit("找不到图标: %s" % ICON)
+    if not os.path.isfile(os.path.join(HERDR_TUI, "herdr.exe")):
+        sys.exit("找不到内置 Herdr TUI: %s（设置 HERDR_TUI_DIR 指向 herdr-windows-x86_64.zip 解压目录）" % HERDR_TUI)
 
     shutil.rmtree(BUILD, ignore_errors=True)
     os.makedirs(PAYLOAD)
@@ -51,6 +55,8 @@ def main():
     shutil.copy2(BRIDGE, os.path.join(PAYLOAD, "ccs-herdr.exe"))
     print("复制插件…")
     shutil.copytree(PLUGIN, os.path.join(PAYLOAD, "plugin"))
+    print("复制内置 Herdr TUI…")
+    shutil.copytree(HERDR_TUI, os.path.join(PAYLOAD, "herdr"))
     shutil.copy2(os.path.join(ROOT, "README.md"), os.path.join(PAYLOAD, "README.md"))
     shutil.copy2(os.path.join(ROOT, "LICENSE"), os.path.join(PAYLOAD, "LICENSE"))
 

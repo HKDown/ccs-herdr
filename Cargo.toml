@@ -1,0 +1,21 @@
+[package]
+name = "ccs-herdr"
+version = "0.1.0"
+edition = "2021"
+description = "ccs x Herdr integration (cross-platform: Windows, Linux, macOS)"
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["herdr", "ccs", "agents", "session", "multiplexer"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "ccs-herdr"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+
+# 零第三方依赖：只使用 Rust 标准库，保证离线可编译、三个平台行为一致。
+[dependencies]

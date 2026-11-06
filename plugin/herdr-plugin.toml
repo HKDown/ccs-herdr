@@ -1,0 +1,38 @@
+id = "ccs.sessions"
+name = "ccs"
+version = "0.1.0"
+min_herdr_version = "0.7.0"
+description = "ccs 会话集成：命名会话、跨重启恢复、多 agent、消息总线"
+platforms = ["windows", "linux", "macos"]
+
+# 命令使用安装到 PATH 的 ccs-herdr。
+# 开发时可改成绝对路径，例如：
+#   command = ["/home/me/.cargo/bin/ccs-herdr", "list"]
+
+[[actions]]
+id = "list"
+title = "ccs: 列出会话"
+contexts = ["workspace", "pane"]
+command = ["ccs-herdr", "list"]
+
+[[actions]]
+id = "open"
+title = "ccs: 打开会话窗格"
+contexts = ["workspace"]
+command = ["ccs-herdr", "open"]
+
+[[actions]]
+id = "restore"
+title = "ccs: 恢复所有会话"
+command = ["ccs-herdr", "restore", "--open"]
+
+[[actions]]
+id = "bus-inbox"
+title = "ccs: 查看 agent 消息"
+command = ["ccs-herdr", "bus-inbox"]
+
+[[panes]]
+id = "sessions"
+title = "ccs 会话"
+placement = "overlay"
+command = ["ccs-herdr", "pane"]

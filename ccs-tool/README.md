@@ -327,7 +327,7 @@ claude mcp add ccs -- python "D:\tools\ccs-tool\ccs_mcp.py"
   "mcpServers": {
     "ccs": {
       "command": "python",
-      "args": ["D:\\he271\\Desktop\\其他\\ccs-tool\\ccs_mcp.py"],
+      "args": ["D:\\tools\\ccs-tool\\ccs_mcp.py"],
       "env": { "CCS_SESSION": "agent-a" }
     }
   }

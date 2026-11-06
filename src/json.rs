@@ -276,8 +276,8 @@ impl<'a> Parser<'a> {
                 break;
             }
         }
-        let s = std::str::from_utf8(&self.bytes[start..self.pos])
-            .map_err(|e| format!("数字: {e}"))?;
+        let s =
+            std::str::from_utf8(&self.bytes[start..self.pos]).map_err(|e| format!("数字: {e}"))?;
         s.parse::<f64>()
             .map(Json::Num)
             .map_err(|e| format!("数字 '{s}': {e}"))
@@ -352,7 +352,10 @@ mod tests {
         assert_eq!(j.get("c").unwrap().as_bool(), Some(true));
         assert!(j.get("d").unwrap().is_null());
         assert_eq!(
-            j.get("a").unwrap().as_arr().unwrap()[2].get("b").unwrap().as_str(),
+            j.get("a").unwrap().as_arr().unwrap()[2]
+                .get("b")
+                .unwrap()
+                .as_str(),
             Some("x\ny")
         );
     }

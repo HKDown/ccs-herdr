@@ -171,8 +171,8 @@ fn cmd_list(json_out: bool) -> Result<i32, String> {
         return Ok(0);
     }
     println!(
-        "{:<16} {:<8} {:<10} {:<8} {}",
-        "名字", "状态", "agent", "窗格", "session id"
+        "{:<16} {:<8} {:<10} {:<8} session id",
+        "名字", "状态", "agent", "窗格"
     );
     for session in &sessions {
         let name = jstr(session, &["name"]).unwrap_or_else(|| "?".to_string());
@@ -253,12 +253,8 @@ fn cmd_open() -> Result<i32, String> {
             name.clone(),
         ]);
         let command = attach_command(&name);
-        let (code, _, stderr) = herdr::run(&[
-            "pane".to_string(),
-            "run".to_string(),
-            pane.clone(),
-            command,
-        ])?;
+        let (code, _, stderr) =
+            herdr::run(&["pane".to_string(), "run".to_string(), pane.clone(), command])?;
         if code != 0 {
             eprintln!("窗格 {pane} 启动 ccs attach 失败: {}", stderr.trim());
         }
@@ -266,8 +262,15 @@ fn cmd_open() -> Result<i32, String> {
         opened.push((name, pane));
     }
     save_map(&map);
-    let _ = herdr::run(&["workspace".to_string(), "focus".to_string(), workspace.clone()]);
-    println!("已在 Herdr 工作区 {workspace} 打开 {} 个会话窗格。", opened.len());
+    let _ = herdr::run(&[
+        "workspace".to_string(),
+        "focus".to_string(),
+        workspace.clone(),
+    ]);
+    println!(
+        "已在 Herdr 工作区 {workspace} 打开 {} 个会话窗格。",
+        opened.len()
+    );
     for (name, pane) in opened {
         println!("  {:<16} pane={}", name, pane);
     }
@@ -393,9 +396,8 @@ fn cmd_sync() -> Result<i32, String> {
 }
 
 fn pass_through(args: &[String]) -> Result<i32, String> {
-    let bin = ccs::ccs_bin().ok_or_else(|| {
-        "找不到 ccs 可执行文件（安装 ccs 或设置 CCS_BIN）".to_string()
-    })?;
+    let bin = ccs::ccs_bin()
+        .ok_or_else(|| "找不到 ccs 可执行文件（安装 ccs 或设置 CCS_BIN）".to_string())?;
     let status = std::process::Command::new(bin)
         .args(args)
         .status()
@@ -427,7 +429,9 @@ fn cmd_bus_send(args: &[String]) -> Result<i32, String> {
     let message = args
         .iter()
         .rev()
-        .find(|arg| !arg.starts_with("--") && flag_value(args, "--from").as_deref() != Some(arg.as_str()) )
+        .find(|arg| {
+            !arg.starts_with("--") && flag_value(args, "--from").as_deref() != Some(arg.as_str())
+        })
         .cloned()
         .ok_or_else(|| "缺少消息内容: ccs-herdr bus-send --from X --to Y MESSAGE".to_string())?;
     // 最后一个非 flag 参数作为消息（可能是多个词，按空格拼回）

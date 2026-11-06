@@ -17,7 +17,9 @@ pub fn ccs_home() -> PathBuf {
             return PathBuf::from(v);
         }
     }
-    home().map(|h| h.join(".ccs")).unwrap_or_else(|| PathBuf::from(".ccs"))
+    home()
+        .map(|h| h.join(".ccs"))
+        .unwrap_or_else(|| PathBuf::from(".ccs"))
 }
 
 /// ccs-herdr 自己的数据目录（与 ccs、其他项目隔离）：
@@ -53,7 +55,10 @@ pub fn default_data_dir(
         }
     } else if macos {
         if let Some(h) = home {
-            return h.join("Library").join("Application Support").join("ccs-herdr");
+            return h
+                .join("Library")
+                .join("Application Support")
+                .join("ccs-herdr");
         }
     } else if let Some(base) = xdg {
         return base.join("ccs-herdr");
@@ -109,7 +114,13 @@ mod tests {
     fn data_dir_per_platform() {
         let home = Some(PathBuf::from("/home/u"));
         assert_eq!(
-            default_data_dir(Some(PathBuf::from("C:/Users/u/AppData/Roaming")), None, home.clone(), true, false),
+            default_data_dir(
+                Some(PathBuf::from("C:/Users/u/AppData/Roaming")),
+                None,
+                home.clone(),
+                true,
+                false
+            ),
             PathBuf::from("C:/Users/u/AppData/Roaming").join("ccs-herdr")
         );
         assert_eq!(
@@ -117,7 +128,13 @@ mod tests {
             PathBuf::from("/home/u/Library/Application Support/ccs-herdr")
         );
         assert_eq!(
-            default_data_dir(None, Some(PathBuf::from("/home/u/.config")), home.clone(), false, false),
+            default_data_dir(
+                None,
+                Some(PathBuf::from("/home/u/.config")),
+                home.clone(),
+                false,
+                false
+            ),
             PathBuf::from("/home/u/.config/ccs-herdr")
         );
         assert_eq!(

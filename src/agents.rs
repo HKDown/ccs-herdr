@@ -134,16 +134,14 @@ pub fn resume_argv(record: &Json) -> Option<Vec<String>> {
         .and_then(|v| v.as_str())
         .map(|s| s.to_string())
         .unwrap_or_else(|| detect(&exe).to_string());
-    let name = record
-        .get("name")
-        .and_then(|v| v.as_str())
-        .unwrap_or("");
+    let name = record.get("name").and_then(|v| v.as_str()).unwrap_or("");
     let spec = spec_for(&kind)?;
     let sid = session_id_of(record);
     if let (Some(sid), Some(template)) = (sid.as_deref(), spec.resume) {
         return Some(expand(template, &exe, name, sid));
     }
-    spec.cont.map(|template| expand(template, &exe, name, sid.as_deref().unwrap_or("")))
+    spec.cont
+        .map(|template| expand(template, &exe, name, sid.as_deref().unwrap_or("")))
 }
 
 #[cfg(test)]
@@ -180,7 +178,11 @@ mod tests {
         let record = json::parse(r#"{"name":"x","agent":"codex","argv":["codex"]}"#).unwrap();
         assert_eq!(
             resume_argv(&record).unwrap(),
-            vec!["codex".to_string(), "resume".to_string(), "--last".to_string()]
+            vec![
+                "codex".to_string(),
+                "resume".to_string(),
+                "--last".to_string()
+            ]
         );
     }
 }

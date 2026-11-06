@@ -11,9 +11,8 @@ fn clear_screen() {
 }
 
 fn attach(name: &str) -> Result<(), String> {
-    let bin = ccs::ccs_bin().ok_or_else(|| {
-        "找不到 ccs 可执行文件（安装 ccs 或设置 CCS_BIN）".to_string()
-    })?;
+    let bin = ccs::ccs_bin()
+        .ok_or_else(|| "找不到 ccs 可执行文件（安装 ccs 或设置 CCS_BIN）".to_string())?;
     let status = Command::new(bin)
         .arg("attach")
         .arg(name)
@@ -34,13 +33,23 @@ pub fn run() -> Result<i32, String> {
         }
         for (index, session) in sessions.iter().enumerate().take(9) {
             let name = session.get("name").and_then(|v| v.as_str()).unwrap_or("?");
-            let status = session.get("status").and_then(|v| v.as_str()).unwrap_or("?");
+            let status = session
+                .get("status")
+                .and_then(|v| v.as_str())
+                .unwrap_or("?");
             let agent = session.get("agent").and_then(|v| v.as_str()).unwrap_or("-");
             let sid = session
                 .get("session_id")
                 .and_then(|v| v.as_str())
                 .unwrap_or("");
-            println!("  {}. {:<16} {:<8} {:<10} {}", index + 1, name, status, agent, sid);
+            println!(
+                "  {}. {:<16} {:<8} {:<10} {}",
+                index + 1,
+                name,
+                status,
+                agent,
+                sid
+            );
         }
         println!("{}", "-".repeat(70));
         print!("  数字 = 在该窗格 attach | r = 刷新 | q = 退出 > ");

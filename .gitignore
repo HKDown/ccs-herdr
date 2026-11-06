@@ -1,7 +1,28 @@
-target/
-build/
-dist/
-*.log
-build_*.py
-**/*.rs.bk
-*.pdb
+# ---- 构建产物 ----
+**/target/
+**/pylib/
+**/work/
+**/dist/
+ccs-tool/build/dl/
+ccs-tool/build/tmp/
+ccs-tool/build/payload/
+ccs-tool/build/*.zip
+ccs-tool/build/*.exe
+ccs-tool/build/*.log
+ccs-tool/build/ccs.spec
+ccs-herdr/build/
+ccs-herdr/dist/
+
+# ---- 运行时/临时 ----
+**/__pycache__/
+**/*.pyc
+**/*.log
+**/.ccs/
+**/_tmp/
+**/node_modules/
+
+# ---- 上游参考源码（第三方，可重新下载）----
+herdr-src/
+
+# ---- 发布产物 ----
+artifacts/

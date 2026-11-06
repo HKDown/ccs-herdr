@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ccs 控制台</title>
+<link rel="stylesheet" href="/static/xterm.css">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="side-head">
+      <span class="logo">ccs</span>
+      <span class="sub">会话控制台</span>
+      <button id="btn-new" class="primary">＋ 新建</button>
+    </div>
+    <div id="sessions"></div>
+    <div class="side-foot"><span id="daemon-state">连接中…</span></div>
+  </aside>
+  <main>
+    <div id="tabbar">
+      <div class="tab active" data-pane="term">终端 <span id="cur-name" class="cur-name"></span></div>
+      <div class="tab" data-pane="bus">消息总线</div>
+      <div class="spacer"></div>
+      <button id="btn-rename" class="ghost">重命名</button>
+      <button id="btn-kill" class="ghost danger">停止</button>
+    </div>
+    <div id="term-pane">
+      <div id="term"></div>
+      <div id="empty-tip">从左侧选择一个会话，或点击“＋ 新建”开始。</div>
+    </div>
+    <div id="bus-pane" class="hidden">
+      <div id="bus-messages"><div class="bus-empty">暂无消息</div></div>
+      <div class="bus-form">
+        <div class="bus-row">
+          <input id="bus-from" value="web" placeholder="发送者">
+          <input id="bus-to" placeholder="收件人（留空则广播）">
+          <input id="bus-group" placeholder="组名（可选）">
+        </div>
+        <div class="bus-row">
+          <textarea id="bus-text" placeholder="输入消息，Enter 发送（Shift+Enter 换行）"></textarea>
+          <button id="bus-send" class="primary">发送</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="modal" class="hidden">
+  <div class="modal-box">
+    <h3>新建会话</h3>
+    <label>会话名字<input id="f-name" placeholder="例如 claude1"></label>
+    <label>启动命令<input id="f-cmd" value="claude" placeholder="claude / cmd.exe / powershell"></label>
+    <label>工作目录<input id="f-cwd" placeholder="留空使用当前目录"></label>
+    <div class="modal-actions">
+      <button id="f-cancel" class="ghost">取消</button>
+      <button id="f-ok" class="primary">创建</button>
+    </div>
+    <div id="f-error" class="error"></div>
+  </div>
+</div>
+
+<script src="/static/xterm.js"></script>
+<script src="/static/addon-fit.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,45 +1,47 @@
 # ccs-herdr-all
 
-ccs（多 agent 会话管理）+ Herdr TUI（终端 agent 多路复用）一体化项目的**统一目录**，由一个 git 仓库管理。
+给 coding agents 的**会话管理 + 终端工作区**一体化项目：
 
-## 目录结构
+- **ccs**（Python）：命名会话、关窗不丢、跨重启恢复（Claude Code / Codex / Pi / Gemini / OpenCode / Qwen …）、SQLite 消息总线、MCP server、浏览器可视化控制台；
+- **Herdr 集成**（Rust）：ccs-herdr 桥接 + Herdr 插件（会话列表 / 打开窗格 / 恢复 / 消息）+ 离线一体化安装器；
+- **Herdr TUI** 作为终端界面：窗口、分屏、agent 状态、多机 SSH。
 
-```
-ccs-herdr-all/
-  ccs-tool/        ccs 本体（Python 引擎）
-    ccs.py            ConPTY 守护进程 / attach / restore / web 入口
-    ccs_agents.py     多 agent 适配（claude/codex/pi/gemini/...）
-    ccs_bus.py        消息总线（SQLite）
-    ccs_mcp.py        MCP server
-    ccs_web.py        可视化控制台后端
-    web/              可视化前端（xterm.js）
-    build/            打包脚本（PyInstaller 等）
-  ccs-herdr/       Herdr 集成（Rust 桥接 + 插件 + 安装器）
-    src/              ccs-herdr CLI（零依赖 Rust）
-    plugin/           Herdr 插件清单
-    installer/        一体化安装器（C#）
-    packaging/        打包脚本（生成 setup.exe）
-  herdr-src/       上游 Herdr 源码（仅参考，不入库）
-    herdr/            Herdr TUI 0.9.5
-    herdr-core/       herdr-core
-    herdr-app/        Herdr 2 桌面版
-    herdr-tui-bin/    Windows 官方发布包解压（安装包内置的就是它）
-  artifacts/       发布产物（不入库）
-    ccs-herdr-setup-0.3.0.exe        离线一体化安装包（推荐）
-    ccs-herdr-0.1.0-win64.exe        单文件 Rust 桥接
-    ccs-setup-0.3.1.exe              ccs 本体安装包
-    ccs-portable-0.3.1.zip           ccs 便携版
-```
+> 本项目是独立集成，与 Herdr 项目无隶属关系。安装包内置未修改的 Herdr TUI 二进制（Apache-2.0），仓库本身不包含 Herdr 源码。
 
-## 构建
+## 功能
+
+- 命名会话：ccs new NAME -- claude / codex / pi ...
+- 关窗不丢 + 重启恢复：ccs restore（按 agent 能力自动 --resume / --continue / 仅重建）
+- Herdr 集成：ccs-herdr open 把会话映射成 Herdr 窗格，ccs-herdr sync 同步 session id
+- 多 agent 消息总线：ccs bus send/inbox，MCP 工具 bus_send/bus_inbox/session_send
+- 可视化控制台：ccs web（本地 HTTP + xterm.js）
+- 离线一体化安装包：内置 ccs 引擎 + 桥接 + Herdr TUI + 插件
+
+## 安装
+
+发布产物见 artifacts/（不纳入 git）：
+
+- ccs-herdr-setup-0.3.0.exe：Windows 离线一体化安装包（推荐）
+- ccs-setup-0.3.1.exe / ccs-portable-0.3.1.zip：仅 ccs 本体
+- ccs-herdr-0.1.0-win64.exe：单文件 Rust 桥接
+
+安装后新开终端：
 
 ```
-# Rust 桥接
+ccs daemon start
+ccs new claude1 -- claude
+ccs-herdr install-plugin
+ccs-herdr open
+```
+
+## 从源码构建
+
+```
+# Rust 桥接（零第三方依赖）
 cd ccs-herdr
 cargo build --release
 
-# 一体化离线安装包（需要 ccs 引擎 dist 与 herdr TUI 目录）
-cd ccs-herdr
+# 一体化离线安装包（需要 ccs 引擎 dist 与 Herdr TUI 目录）
 python packaging/build_setup.py
 
 # ccs 本体（PyInstaller）
@@ -47,28 +49,24 @@ cd ccs-tool
 python build/build_exe.py
 ```
 
-## 运行
+构建环境恢复（Rust 工具链、PyInstaller 依赖、Herdr TUI 下载）见 [docs/BUILD-ENV.md](docs/BUILD-ENV.md)。
+
+## 目录
 
 ```
-# ccs 引擎
-ccs daemon start
-ccs new claude1 -- claude
-ccs attach claude1
-ccs restore
-
-# Herdr 集成
-ccs-herdr list / open / restore / sync
-ccs-herdr install-plugin
+ccs-tool/     ccs 本体（Python）：ccs.py / ccs_agents.py / ccs_bus.py / ccs_mcp.py / ccs_web.py / web
+ccs-herdr/    Herdr 集成（Rust + 插件 + 安装器 + 打包脚本）
+docs/         构建环境说明
+artifacts/    发布产物（不入库）
+herdr-src/    打包所需的 Herdr TUI 二进制（不入库，可从上游下载）
 ```
 
-## Git
+## 平台
 
-- 仓库根：本目录（`git log` 可见历史）；
-- 忽略：构建产物（target/build/dist/pylib）、发布产物（artifacts/）、上游源码（herdr-src/）；
-- 代码：ccs-tool 与 ccs-herdr 全部受版本管理。
+- ccs 引擎：Windows（ConPTY）/ Linux / macOS（Python 3.10+）
+- ccs-herdr：Windows / Linux / macOS（Rust，零依赖）
+- 一体化安装包：目前为 Windows x64
 
-## 说明
+## 许可证
 
-- 一体化安装包**离线**内置 ccs 引擎、ccs-herdr、Herdr TUI 0.9.5 与插件，装一次即可用；
-- 数据目录：ccs 状态在 `%USERPROFILE%\.ccs`，ccs-herdr 数据在 `%APPDATA%\ccs-herdr`；
-- 上游 Herdr 源码仅作参考，不纳入版本管理（可重新下载）。
+MIT（见 LICENSE）。安装包内置的 Herdr TUI 为 Apache-2.0，详见 NOTICE 与随附的第三方许可文件。

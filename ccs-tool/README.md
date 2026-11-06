@@ -82,7 +82,7 @@ ccs-tool 的做法：
 ### 方式 A：不安装，直接在源码目录运行
 
 ```powershell
-cd D:\he271\Desktop\其他\ccs-tool
+cd D:\tools\ccs-tool
 .\ccs.cmd version
 # 等价于：
 python .\ccs.py version
@@ -93,7 +93,7 @@ python .\ccs.py version
 ### 方式 B：install.ps1（推荐，生成全局 `ccs` 命令）
 
 ```powershell
-cd D:\he271\Desktop\其他\ccs-tool
+cd D:\tools\ccs-tool
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
 
 # 开机自启（可选）：
@@ -317,7 +317,7 @@ python ccs.py bus groups
 把 `ccs_mcp.py` 的绝对路径注册给 Claude Code：
 
 ```powershell
-claude mcp add ccs -- python "D:\he271\Desktop\其他\ccs-tool\ccs_mcp.py"
+claude mcp add ccs -- python "D:\tools\ccs-tool\ccs_mcp.py"
 ```
 
 或在项目根目录写 `.mcp.json`（Windows 路径里的反斜杠要写两遍）：
@@ -407,7 +407,7 @@ python ccs.py autostart off    # 取消
 实现：在 `HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run` 写入名为 `ccs-daemon` 的值，内容等价于：
 
 ```text
-pythonw.exe "D:\he271\Desktop\其他\ccs-tool\ccs.py" daemon start --restore --quiet
+pythonw.exe "D:\tools\ccs-tool\ccs.py" daemon start --restore --quiet
 ```
 
 - 只写当前用户（HKCU），**不需要管理员权限**；
@@ -462,7 +462,7 @@ daemon start → new smoke -- cmd.exe → ls --json 含 smoke → send "echo SMO
 每一步打印 `[PASS]` / `[FAIL]`，最后汇总；全部通过 exit 0，否则 exit 1。
 
 ```powershell
-cd D:\he271\Desktop\其他\ccs-tool
+cd D:\tools\ccs-tool
 powershell -NoProfile -ExecutionPolicy Bypass -File .\test_smoke.ps1
 # 有 PowerShell 7 时等价：
 pwsh -NoProfile -File .\test_smoke.ps1

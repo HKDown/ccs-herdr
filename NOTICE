@@ -1,0 +1,15 @@
+ccs-herdr-all
+Copyright (c) 2026 ccs-herdr contributors
+
+This repository is an independent integration and is not affiliated with the Herdr project.
+
+The Windows installer built from this repository bundles the unmodified Herdr TUI binary
+(herdr 0.9.5, https://github.com/herdrdev/herdr), which is distributed under the
+Apache License 2.0. The Herdr source code is NOT included in this repository; it is
+downloaded separately when building the installer (see docs/BUILD-ENV.md).
+
+Bundled third-party notices are shipped inside the installer under
+THIRD-PARTY-NOTICES/ (see the Herdr release archive).
+
+Python dependencies used only at build time (PyInstaller etc.) are not distributed
+with this repository.

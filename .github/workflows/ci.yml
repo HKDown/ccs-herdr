@@ -25,7 +25,8 @@ jobs:
       - run: cargo build --release
 
   python:
-    runs-on: ubuntu-latest
+    # ccs 引擎基于 Windows ConPTY，只在 Windows 上做语法/冒烟检查
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +35,7 @@ jobs:
       - name: Syntax check
         run: python -m py_compile ccs-tool/ccs.py ccs-tool/ccs_agents.py ccs-tool/ccs_bus.py ccs-tool/ccs_mcp.py ccs-tool/ccs_web.py
       - name: Smoke test
+        shell: bash
         run: |
           export CCS_HOME="$PWD/.ci-ccs-home"
           python ccs-tool/ccs.py version

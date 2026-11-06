@@ -63,7 +63,7 @@ herdr-src/    打包所需的 Herdr TUI 二进制（不入库，可从上游下�
 
 ## 平台
 
-- ccs 引擎：Windows（ConPTY）/ Linux / macOS（Python 3.10+）
+- ccs 引擎：Windows（ConPTY，Python 3.10+）；Linux/macOS 尚未实现（ccs.py 直接依赖 Windows API）
 - ccs-herdr：Windows / Linux / macOS（Rust，零依赖）
 - 一体化安装包：目前为 Windows x64
 

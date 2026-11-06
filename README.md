@@ -1,6 +1,6 @@
 # ccs-herdr
 
-把 **ccs**（命名会话 / 跨重启恢复 / 多 agent / 消息总线）集成进 **Herdr**（agent multiplexer）。
+把 **ccs**（命名会话 / 跨重启恢复 / 多 agent / 消息总线）集成进 **Herdr TUI**（[herdrdev/herdr](https://github.com/herdrdev/herdr)，终端界面版 agent multiplexer）。
 
 - **语言与 Herdr 生态一致**：纯 Rust 实现（Herdr core/UI 与官方插件框架均为 Rust）；
 - **跨平台**：Windows / Linux / macOS 同一套代码，CI 三平台构建与测试；
@@ -22,13 +22,24 @@
 | ccs-herdr pane | 会话面板（行式，跨平台） |
 | ccs-herdr doctor | 诊断路径/依赖/守护进程 |
 
+## 目标 Herdr 版本
+
+本工具针对 **Herdr TUI（herdrdev/herdr）** 开发与验证：
+
+- 已验证版本：**herdr 0.9.5**（Windows 官方包 `herdr-windows-x86_64.zip`，含 `herdr.exe` + ConPTY 运行时）；
+- 用真实二进制验证过：`herdr plugin link <本仓库>/plugin` 被接受，动作（list/open/restore/bus-inbox）和 overlay 面板 `ccs 会话` 均出现在插件清单里；
+- 使用的 CLI：`herdr workspace create`、`herdr tab create`、`herdr pane run/rename`、`herdr pane report-agent-session <PANE_ID>`、`herdr plugin link`；
+- Herdr TUI 安装：下载 release 的 Windows zip 解压，或运行 `powershell -c "irm https://herdr.dev/install.ps1 | iex"`。
+
+> 桌面版 herdr-app（Herdr 2，基于 herdr-core）不是本工具的目标；两者 CLI/插件接口不同。
+
 ## 一键安装（推荐）
 
 下载 `ccs-herdr-setup-0.2.0.exe` 双击安装即可，**不需要另外安装 ccs**：
 
 - 安装包内置 ccs 引擎（ccs 0.3.1，含 Python 运行时）、ccs-herdr 桥接、Herdr 插件；
 - 装到 `%LOCALAPPDATA%\Programs\ccs-herdr`，自动加 PATH、创建「ccs 控制台」和「ccs-herdr 面板」快捷方式；
-- 检测到 Herdr 时自动 `herdr plugin link`；没装 Herdr 可在安装界面勾选自动安装（需要网络）；
+- 检测到 Herdr TUI 时自动 `herdr plugin link`；没装 Herdr 可在安装界面勾选自动安装（走官方 `https://herdr.dev/install.ps1`，即 TUI 安装器，需要网络）；
 - 卸载：设置 → 应用 → ccs-herdr，或安装目录下 `ccs-herdr-uninstall.exe`。
 
 静默安装：`ccs-herdr-setup-0.2.0.exe /S /DIR="D:\Tools\ccs-herdr" /herdr`
@@ -92,7 +103,8 @@ ccs 自己的状态仍在 ccs 的 CCS_HOME（默认 ~/.ccs），本工具只读�
 - `cargo check --all-targets`、`cargo fmt --check`、`cargo clippy --all-targets -- -D warnings` 通过；
 - `cargo build --release` 在本机产出 Windows 二进制（约 480 KB），已实测 `version` / `doctor` / `list` / `restore`
   与 ccs 守护进程（TCP JSON-RPC）正常通信；
-- `cargo test` 由 CI 在 ubuntu / windows / macos 三个平台运行（见 .github/workflows/ci.yml）。
+- `cargo test` 由 CI 在 ubuntu / windows / macos 三个平台运行（见 .github/workflows/ci.yml）；
+- 用真实 Herdr TUI 0.9.5 二进制验证插件：`herdr plugin link` 成功，插件动作/面板被 Herdr 识别（见“目标 Herdr 版本”）。
 
 ## License
 

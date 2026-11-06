@@ -369,6 +369,7 @@ fn cmd_sync() -> Result<i32, String> {
             None => continue,
         };
         let agent = jstr(session, &["agent"]).unwrap_or_else(|| "generic".to_string());
+        // Herdr TUI: herdr pane report-agent-session [OPTIONS] <PANE_ID> [-- RESUME_ARG...]
         let mut herdr_args = vec![
             "pane".to_string(),
             "report-agent-session".to_string(),
@@ -378,6 +379,7 @@ fn cmd_sync() -> Result<i32, String> {
             agent,
             "--agent-session-id".to_string(),
             sid,
+            pane.clone(),
         ];
         if let Some(resume) = agents::resume_argv(session) {
             herdr_args.push("--".to_string());

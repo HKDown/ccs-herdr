@@ -1,8 +1,5 @@
 target/
+build/
+dist/
 **/*.rs.bk
 *.pdb
-
-*.log
-build_*.py
-dist/
-

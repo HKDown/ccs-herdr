@@ -22,6 +22,17 @@
 | ccs-herdr pane | 会话面板（行式，跨平台） |
 | ccs-herdr doctor | 诊断路径/依赖/守护进程 |
 
+## 一键安装（推荐）
+
+下载 `ccs-herdr-setup-0.2.0.exe` 双击安装即可，**不需要另外安装 ccs**：
+
+- 安装包内置 ccs 引擎（ccs 0.3.1，含 Python 运行时）、ccs-herdr 桥接、Herdr 插件；
+- 装到 `%LOCALAPPDATA%\Programs\ccs-herdr`，自动加 PATH、创建「ccs 控制台」和「ccs-herdr 面板」快捷方式；
+- 检测到 Herdr 时自动 `herdr plugin link`；没装 Herdr 可在安装界面勾选自动安装（需要网络）；
+- 卸载：设置 → 应用 → ccs-herdr，或安装目录下 `ccs-herdr-uninstall.exe`。
+
+静默安装：`ccs-herdr-setup-0.2.0.exe /S /DIR="D:\Tools\ccs-herdr" /herdr`
+
 ## 构建
 
     cargo build --release

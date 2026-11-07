@@ -1,5 +1,9 @@
 # ccs-herdr-all
 
+[![Release](https://img.shields.io/github/v/release/HKDown/ccs-herdr)](https://github.com/HKDown/ccs-herdr/releases)
+[![CI](https://github.com/HKDown/ccs-herdr/actions/workflows/ci.yml/badge.svg)](https://github.com/HKDown/ccs-herdr/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 给 coding agents 的**会话管理 + 终端工作区**一体化项目：
 
 - **ccs**（Python）：命名会话、关窗不丢、跨重启恢复（Claude Code / Codex / Pi / Gemini / OpenCode / Qwen …）、SQLite 消息总线、MCP server、浏览器可视化控制台；
@@ -34,6 +38,12 @@ ccs-herdr install-plugin
 ccs-herdr open
 ```
 
+## 版本与更新日志
+
+- 当前版本：**v0.3.0**（2026-11-07）——离线一体化安装包 + 三平台桥接二进制
+- 完整更新内容见 [CHANGELOG.md](CHANGELOG.md)
+- 下载地址：[GitHub Releases](https://github.com/HKDown/ccs-herdr/releases)
+
 ## 发布（Releases）
 
 - 推送 `v*` tag（或手动触发 Release workflow）会自动为三平台构建 ccs-herdr 桥接二进制并附加到 GitHub Release：
@@ -42,6 +52,7 @@ ccs-herdr open
   - `ccs-herdr-macos-aarch64`
   - `SHA256SUMS.txt`
 - Windows 完整安装包（含 ccs 引擎 + Herdr TUI）需单独构建后上传到 Release，构建步骤见 [docs/BUILD-ENV.md](docs/BUILD-ENV.md)。
+- 当前 Release：[v0.3.0](https://github.com/HKDown/ccs-herdr/releases/tag/v0.3.0)（安装包 + 三平台桥接 + SHA256SUMS）。
 
 ## 从源码构建
 

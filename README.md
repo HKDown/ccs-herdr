@@ -34,6 +34,15 @@ ccs-herdr install-plugin
 ccs-herdr open
 ```
 
+## 发布（Releases）
+
+- 推送 `v*` tag（或手动触发 Release workflow）会自动为三平台构建 ccs-herdr 桥接二进制并附加到 GitHub Release：
+  - `ccs-herdr-linux-x86_64`
+  - `ccs-herdr-windows-x86_64.exe`
+  - `ccs-herdr-macos-aarch64`
+  - `SHA256SUMS.txt`
+- Windows 完整安装包（含 ccs 引擎 + Herdr TUI）需单独构建后上传到 Release，构建步骤见 [docs/BUILD-ENV.md](docs/BUILD-ENV.md)。
+
 ## 从源码构建
 
 ```
